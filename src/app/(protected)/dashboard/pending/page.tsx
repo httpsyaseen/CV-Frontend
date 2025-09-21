@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, MoveLeft, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/api";
 
@@ -90,17 +90,17 @@ export default function PendingRequestsPage() {
     return roleMap[role] || role;
   };
 
-  const getTargetMarketsDisplay = (markets: string[]) => {
-    const marketMap: Record<string, string> = {
-      uk: "UK",
-      republicOfIreland: "Ireland",
-      europe: "Europe",
-      america: "America",
-      gcc: "GCC",
-      others: "Others",
-    };
-    return markets.map((market) => marketMap[market] || market).join(", ");
-  };
+  // const getTargetMarketsDisplay = (markets: string[]) => {
+  //   const marketMap: Record<string, string> = {
+  //     uk: "UK",
+  //     republicOfIreland: "Ireland",
+  //     europe: "Europe",
+  //     america: "America",
+  //     gcc: "GCC",
+  //     others: "Others",
+  //   };
+  //   return markets.map((market) => marketMap[market] || market).join(", ");
+  // };
   return (
     <div className="min-h-screen bg-white mx-16">
       <div className="container mx-auto px-4 py-8">
@@ -115,11 +115,20 @@ export default function PendingRequestsPage() {
                 Track the progress of your submitted CV review requests
               </p>
             </div>
-            <Link href="/dashboard">
-              <Button variant="outline" className="bg-green-600 text-white">
-                Back to Dashboard
-              </Button>
-            </Link>
+            <div className="space-x-4">
+              <Link href="/dashboard">
+                <Button variant="outline" className="bg-green-600 text-white">
+                  <MoveLeft className="w-4 h-4 ml-2" />
+                  Back to Dashboard
+                </Button>
+              </Link>
+              <Link href="/dashboard/new-request">
+                <Button variant="outline" className="bg-green-600 text-white">
+                  Create New Request
+                  <PlusCircle className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -166,7 +175,6 @@ export default function PendingRequestsPage() {
                       <TableHead>Person Name</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Job Role</TableHead>
-                      <TableHead>Target Markets</TableHead>
                       <TableHead>Service Level</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -180,7 +188,7 @@ export default function PendingRequestsPage() {
                           {new Date(cv.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell className="font-medium">
-                          {cv.fullName}
+                          {cv.lastName}
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -197,9 +205,7 @@ export default function PendingRequestsPage() {
                         <TableCell>
                           {getJobRoleDisplay(cv.applyingForJobRole)}
                         </TableCell>
-                        <TableCell>
-                          {getTargetMarketsDisplay(cv.targetMarkets)}
-                        </TableCell>
+
                         <TableCell>
                           <Badge
                             className={

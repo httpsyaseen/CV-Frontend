@@ -64,6 +64,29 @@ const formatDate = (dateString: string): string => {
   }
 };
 
+// Get job role display name
+const getJobRoleDisplay = (role: string): string => {
+  const roleMap: Record<string, string> = {
+    tier1: "Tier 1 (SHO, CT/ST1–2, FY2, JCF, CF, etc.)",
+    middleGrade: "Middle Grade (Registrar, SpR, SCF, CF, etc.)",
+    consultant: "Consultant",
+  };
+  return roleMap[role] || role;
+};
+
+// Get target markets display
+const getTargetMarketsDisplay = (markets: string[]): string => {
+  const marketMap: Record<string, string> = {
+    uk: "UK",
+    republicOfIreland: "Ireland",
+    europe: "Europe",
+    america: "America",
+    gcc: "GCC",
+    others: "Others",
+  };
+  return markets.map((market) => marketMap[market] || market).join(", ");
+};
+
 // Generate filename with collision handling
 const generateFilename = (lastName: string, counter: number = 1): string => {
   const randomString = generateRandomString();
@@ -86,6 +109,31 @@ export const convertCVToTxt = (
   lines.push(`Service level = ${cvData.serviceLevel}`);
   lines.push(`Last name = ${cvData.lastName}`);
   lines.push(""); // Empty line for spacing
+
+  // Personal Details Section
+  lines.push("=".repeat(50));
+  lines.push("PERSONAL DETAILS");
+  lines.push("=".repeat(50));
+  lines.push("");
+  lines.push(`First Name: ${cvData.firstName}`);
+  lines.push(`Last Name: ${cvData.lastName}`);
+  lines.push(
+    `Full Name: ${cvData.fullName || `${cvData.firstName} ${cvData.lastName}`}`
+  );
+
+  // Email from userId or direct field
+  const email = cvData.userId?.email || cvData.email || "N/A";
+  lines.push(`Email: ${email}`);
+
+  lines.push(`Year of Birth: ${cvData.yearOfBirth}`);
+  lines.push(`Year of Medical Graduation: ${cvData.yearOfMedicalGraduation}`);
+  lines.push(
+    `Applying for Job Role: ${getJobRoleDisplay(cvData.applyingForJobRole)}`
+  );
+  lines.push(
+    `Target Markets: ${getTargetMarketsDisplay(cvData.targetMarkets)}`
+  );
+  lines.push("");
 
   // Previous Experience Section(s)
   if (cvData.previousExperiences && cvData.previousExperiences.length > 0) {
@@ -180,6 +228,18 @@ export const convertCVToTxt = (
   }
   lines.push("");
 
+  // Footer with metadata
+  lines.push("=".repeat(50));
+  lines.push("SUBMISSION DETAILS");
+  lines.push("=".repeat(50));
+  lines.push("");
+  lines.push(`CV ID: ${cvData._id}`);
+  lines.push(`Submission Date: ${formatDate(cvData.createdAt)}`);
+  lines.push(`Status: ${cvData.status}`);
+  lines.push(
+    `Generated: ${new Date().toLocaleString("en-GB", { timeZone: "GMT" })} GMT`
+  );
+
   const content = lines.join("\n");
   const filename = generateFilename(cvData.lastName, counter);
 
@@ -190,7 +250,10 @@ export const convertCVToTxt = (
 };
 
 // Function to trigger download of the generated TXT file
-export const downloadCVAsTxt = (cvData: CVData, counter: number = 1): void => {
+export const downloadCVAsLOGTxt = (
+  cvData: CVData,
+  counter: number = 1
+): void => {
   const { content, filename } = convertCVToTxt(cvData, counter);
 
   // Create blob with UTF-8 encoding

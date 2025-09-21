@@ -9,6 +9,7 @@ import { ServiceLevel } from "./steps/service-level";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import showError from "@/components/send-error";
+import { useRouter } from "next/navigation";
 
 export interface FormData {
   // Basic Information
@@ -71,6 +72,7 @@ const initialFormData: FormData = {
 
 export default function NewRequestPage() {
   const [currentStep, setCurrentStep] = useState(1);
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const totalSteps = 5;
 
@@ -210,7 +212,7 @@ export default function NewRequestPage() {
 
       console.log("CV submitted successfully:", response.data);
       toast.success("CV request submitted successfully!");
-
+      router.replace("/dashboard");
       // Reset form after successful submission
       setFormData(initialFormData);
       setCurrentStep(1);

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WordCounter } from "@/components/word-counter";
 import { Plus, Trash2 } from "lucide-react";
 import type { FormData } from "../page";
@@ -27,6 +28,11 @@ export function PreviousExperience({
   currentStep,
   totalSteps,
 }: PreviousExperienceProps) {
+  // Helper function to get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    return new Date().toISOString().split("T")[0];
+  };
+
   // Helper function for word counting
   const getWordCount = (text: string) => {
     return text
@@ -134,6 +140,31 @@ export function PreviousExperience({
     updateData({ previousExperiences: newJobs });
   };
 
+  // Handle current job checkbox
+  const handleCurrentJobToggle = (index: number, isCurrentJob: boolean) => {
+    const newJobs = [...data.previousExperiences];
+    if (isCurrentJob) {
+      // Set end date to today
+      newJobs[index] = { ...newJobs[index], endDate: getTodayDate() };
+    } else {
+      // Clear end date when unchecked
+      newJobs[index] = { ...newJobs[index], endDate: "" };
+    }
+    updateData({ previousExperiences: newJobs });
+  };
+
+  // Check if a job is current (end date is today)
+  const isCurrentJob = (job: {
+    startDate: string;
+    endDate: string;
+    hospitalName: string;
+    hospitalAddress: string;
+    jobTitle: string;
+    jobDescription: string;
+  }) => {
+    return job.endDate === getTodayDate();
+  };
+
   return (
     <FormStep
       title="Previous Experience and Employment"
@@ -217,7 +248,23 @@ export function PreviousExperience({
                         updateJob(index, "endDate", e.target.value)
                       }
                       className="bg-white"
+                      disabled={isCurrentJob(job)}
                     />
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Checkbox
+                        id={`currentJob-${index}`}
+                        checked={isCurrentJob(job)}
+                        onCheckedChange={(checked) =>
+                          handleCurrentJobToggle(index, checked === true)
+                        }
+                      />
+                      <Label
+                        htmlFor={`currentJob-${index}`}
+                        className="text-sm text-gray-600 cursor-pointer"
+                      >
+                        This is my current job
+                      </Label>
+                    </div>
                   </div>
                 </div>
 

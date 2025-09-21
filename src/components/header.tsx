@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, FileText } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,7 +17,10 @@ export function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <div
+            className="flex items-center space-x-2 cursor-pointer"
+            onClick={() => router.replace("/")}
+          >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <FileText className="h-5 w-5 text-primary-foreground" />
             </div>
@@ -39,30 +43,25 @@ export function Header() {
             // Non-authenticated state - show features navigation and auth buttons
             <>
               <nav className="hidden md:flex items-center space-x-8">
-                <a
-                  href="#home"
+                <Link
+                  href="/#home"
                   className="text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
                 >
                   Home
-                </a>
-                <a
-                  href="#features"
+                </Link>
+                <Link
+                  href="/#features"
                   className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
                 >
                   Features
-                </a>
-                <a
-                  href="#how-it-works"
-                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-                >
-                  How It Works
-                </a>
-                <a
-                  href="#contact"
+                </Link>
+
+                <Link
+                  href="/#contact"
                   className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
                 >
                   Contact
-                </a>
+                </Link>
               </nav>
 
               {/* Desktop Auth Buttons */}

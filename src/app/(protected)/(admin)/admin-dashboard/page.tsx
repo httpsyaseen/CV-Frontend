@@ -68,7 +68,16 @@ export default function AdminDashboard() {
                 <span className="text-3xl font-bold text-blue-600">
                   {loading ? "—" : stats?.total_cvs ?? 0}
                 </span>
+                <p className="text-sm text-gray-600">Total CVs</p>
               </div>
+              <Link href="/admin-dashboard/total">
+                <Button
+                  variant="outline"
+                  className="w-full border-blue-300 text-blue-700  hover:bg-blue-500"
+                >
+                  All CVs
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -88,7 +97,16 @@ export default function AdminDashboard() {
                 <span className="text-3xl font-bold text-green-600">
                   {loading ? "—" : stats?.total_reviews ?? 0}
                 </span>
+                <p className="text-sm text-gray-600">Reviewed CVs</p>
               </div>
+              <Link href="/admin-dashboard/reviewed">
+                <Button
+                  variant="outline"
+                  className="w-full border-green-300 text-green-700  hover:bg-green-500"
+                >
+                  View Reviewed
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 

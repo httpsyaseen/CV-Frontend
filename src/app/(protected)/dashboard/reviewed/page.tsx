@@ -18,122 +18,60 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Download } from "lucide-react";
+import { Loader2, PlusCircle, MoveLeft, Clock10, Eye } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import api from "@/lib/api";
-import { downloadEnhancedReviewPDF } from "@/lib/enhanced-review-pdf-generator";
 
-interface User {
+interface PreviousExperience {
+  startDate: string;
+  endDate: string;
+  hospitalName: string;
+  hospitalAddress: string;
+  jobTitle: string;
+  jobDescription: string;
   _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber?: string;
 }
 
-interface CV {
+interface ReviewedCV {
   _id: string;
+  userId: string;
   firstName: string;
   lastName: string;
+  yearOfBirth: number;
+  yearOfMedicalGraduation: number;
   applyingForJobRole: string;
   targetMarkets: string[];
+  previousExperiences: PreviousExperience[];
+  researchExperience: string;
+  teachingExperience: string;
+  leadershipManagementExperience: string;
+  auditQualityImprovementExperience: string;
+  clinicalSkillsProcedureCompetency: string;
+  personalStatement: string;
   serviceLevel: string;
   status: string;
   createdAt: string;
-  fullName: string;
-  id: string;
-}
-
-interface Reviewer {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-
-interface SectionScore {
-  section_name: string;
-  score: number;
-}
-
-interface GlobalSummary {
-  overall_readiness: string;
-  top_fixes: string[];
-  questions_for_user: string[];
-  scoring_breakdown: SectionScore[];
-  total_score: number;
-}
-
-interface ExampleBadToBetter {
-  bad: string;
-  better: string;
-  why_better: string;
-}
-
-interface ReviewSection {
-  section_name: string;
-  section_status: string;
-  strengths: string[];
-  weaknesses: string[];
-  actionable_edits: string[];
-  examples_bad_to_better: ExampleBadToBetter[];
-  missing_content: string[];
-  section_score: number;
-  justification: string;
-}
-
-interface RewrittenCVSection {
-  section_name: string;
-  content: string;
-}
-
-interface RewrittenCV {
-  sections: RewrittenCVSection[];
-}
-
-interface ReviewMeta {
-  version: string;
-  notes: string;
-  review_date: string;
-}
-
-interface Review {
-  _id: string;
-  cvId: CV;
-  userId: User;
-  review_type: string;
-  status: string;
-  reviewer_id: Reviewer;
-  sections: unknown[];
-  createdAt: string;
   updatedAt: string;
-  completed_at: string;
   __v: number;
-  daysSinceCreation: number;
-  turnaroundDays: number;
+  reviewId: string;
+  reviewedAt: string;
   id: string;
-}
-
-interface DetailedReview extends Review {
-  sections: ReviewSection[];
-  global_summary: GlobalSummary;
-  rewritten_cv: RewrittenCV;
-  meta: ReviewMeta;
 }
 
 interface ApiResponse {
   status: string;
   results: number;
   data: {
-    reviews: Review[];
+    reviewed: ReviewedCV[];
   };
 }
 
 export default function ReviewedRequestsPage() {
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const router = useRouter();
+  const [reviews, setReviews] = useState<ReviewedCV[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [downloadingPDF, setDownloadingPDF] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchReviewedCVs = async () => {
@@ -143,7 +81,7 @@ export default function ReviewedRequestsPage() {
         const data: ApiResponse = response.data;
 
         if (data.status === "success") {
-          setReviews(data.data.reviews);
+          setReviews(data.data?.reviewed || []);
         } else {
           setError("Failed to fetch reviewed CVs");
         }
@@ -158,28 +96,8 @@ export default function ReviewedRequestsPage() {
     fetchReviewedCVs();
   }, []);
 
-  const handleDownloadPDF = async (reviewId: string) => {
-    try {
-      setDownloadingPDF(reviewId);
-
-      // For now, we'll use the review data from the existing reviews array
-      // In a real scenario, you might want to fetch more detailed data
-      const review = reviews.find((r) => r._id === reviewId);
-      if (!review) {
-        throw new Error("Review not found");
-      }
-
-      // Convert the review to the format expected by the PDF generator
-      const reviewData = review as unknown as DetailedReview;
-
-      // Generate and download enhanced PDF
-      downloadEnhancedReviewPDF(reviewData);
-    } catch (error) {
-      console.error("Error downloading PDF:", error);
-      alert("Failed to download PDF. Please try again.");
-    } finally {
-      setDownloadingPDF(null);
-    }
+  const handleViewReport = (reviewId: string) => {
+    router.push(`/review/${reviewId}`);
   };
 
   const getJobRoleDisplay = (role: string) => {
@@ -188,10 +106,12 @@ export default function ReviewedRequestsPage() {
       middleGrade: "Middle Grade (Registrar, SpR, SCF, CF, etc.)",
       consultant: "Consultant",
     };
-    return roleMap[role] || role;
+    return roleMap[role] || role || "Not Specified";
   };
 
-  const getTargetMarketsDisplay = (markets: string[]) => {
+  const getTargetMarketsDisplay = (markets: string[] | undefined) => {
+    if (!markets || !Array.isArray(markets)) return "Not Specified";
+
     const marketMap: Record<string, string> = {
       uk: "UK",
       republicOfIreland: "Ireland",
@@ -216,11 +136,26 @@ export default function ReviewedRequestsPage() {
                 View and download your completed CV reviews
               </p>
             </div>
-            <Link href="/dashboard">
-              <Button variant="outline" className="bg-green-600 text-white">
-                Back to Dashboard
-              </Button>
-            </Link>
+            <div className="space-x-4">
+              <Link href="/dashboard">
+                <Button variant="outline" className="bg-green-600 text-white">
+                  <MoveLeft className="w-4 h-4 ml-2" />
+                  Back to Dashboard
+                </Button>
+              </Link>
+              <Link href="/dashboard/pending">
+                <Button variant="outline" className="bg-amber-600 text-white">
+                  View Pending Requests
+                  <Clock10 className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/dashboard/new-request">
+                <Button variant="outline" className="bg-green-600 text-white">
+                  Create New Request
+                  <PlusCircle className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -271,37 +206,41 @@ export default function ReviewedRequestsPage() {
                       <TableHead>Status</TableHead>
                       <TableHead>Completed Date</TableHead>
                       <TableHead>Turnaround Days</TableHead>
-                      <TableHead>Download PDF</TableHead>
+                      <TableHead>View Report</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {reviews.map((review) => (
                       <TableRow key={review._id} className="hover:bg-gray-50">
                         <TableCell className="font-medium">
+                          {review.reviewId.slice(-8).toUpperCase()}
+                        </TableCell>
+                        <TableCell className="font-medium">
                           {review._id.slice(-8).toUpperCase()}
                         </TableCell>
                         <TableCell className="font-medium">
-                          {review.cvId._id.slice(-8).toUpperCase()}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {review.cvId.fullName}
+                          {review.firstName} {review.lastName}
                         </TableCell>
                         <TableCell>
-                          {getJobRoleDisplay(review.cvId.applyingForJobRole)}
+                          {getJobRoleDisplay(review.applyingForJobRole)}
                         </TableCell>
                         <TableCell>
-                          {getTargetMarketsDisplay(review.cvId.targetMarkets)}
+                          {review.targetMarkets &&
+                          Array.isArray(review.targetMarkets) &&
+                          review.targetMarkets.length > 0
+                            ? getTargetMarketsDisplay(review.targetMarkets)
+                            : "Not Specified"}
                         </TableCell>
                         <TableCell>
                           <Badge
                             className={
-                              review.cvId.serviceLevel === "premium"
+                              review.serviceLevel === "premium"
                                 ? "bg-purple-100 text-purple-800 hover:bg-purple-100 hover:text-purple-800"
                                 : "bg-gray-100 text-gray-800 hover:bg-gray-100 hover:text-gray-800"
                             }
                           >
-                            {review.cvId.serviceLevel.charAt(0).toUpperCase() +
-                              review.cvId.serviceLevel.slice(1)}
+                            {review.serviceLevel.charAt(0).toUpperCase() +
+                              review.serviceLevel.slice(1)}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -311,14 +250,24 @@ export default function ReviewedRequestsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {review.completed_at
-                            ? new Date(review.completed_at).toLocaleDateString()
+                          {review.reviewedAt
+                            ? new Date(review.reviewedAt).toLocaleDateString()
                             : new Date(review.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
                           <span className="text-sm font-medium">
-                            {review.turnaroundDays}{" "}
-                            {review.turnaroundDays === 1 ? "day" : "days"}
+                            {Math.floor(
+                              (new Date().getTime() -
+                                new Date(review.createdAt).getTime()) /
+                                (1000 * 60 * 60 * 24)
+                            )}{" "}
+                            {Math.floor(
+                              (new Date().getTime() -
+                                new Date(review.createdAt).getTime()) /
+                                (1000 * 60 * 60 * 24)
+                            ) === 1
+                              ? "day"
+                              : "days"}
                           </span>
                         </TableCell>
                         <TableCell>
@@ -326,18 +275,11 @@ export default function ReviewedRequestsPage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleDownloadPDF(review._id)}
-                              disabled={downloadingPDF === review._id}
+                              onClick={() => handleViewReport(review.reviewId)}
                               className="flex items-center gap-2 bg-green-600 text-white hover:bg-green-700"
                             >
-                              {downloadingPDF === review._id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <Download className="w-4 h-4" />
-                              )}
-                              {downloadingPDF === review._id
-                                ? "Generating..."
-                                : "Download PDF"}
+                              <Eye className="w-4 h-4" />
+                              View Report
                             </Button>
                           </div>
                         </TableCell>

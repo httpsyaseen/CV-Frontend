@@ -72,7 +72,7 @@ export function BasicInformation({
   return (
     <FormStep
       title="Basic Information"
-      description="Please provide your basic personal and professional information"
+      description="Please provide your last name (required). All other fields are optional but help us serve you better."
       currentStep={currentStep}
       totalSteps={totalSteps}
       onNext={onNext}
@@ -82,7 +82,7 @@ export function BasicInformation({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white">
         {/* First Name */}
         <div className="space-y-2">
-          <Label htmlFor="firstName">First Name *</Label>
+          <Label htmlFor="firstName">First Name</Label>
           <Input
             id="firstName"
             value={data.firstName}
@@ -92,7 +92,7 @@ export function BasicInformation({
                 .slice(0, 60);
               updateData({ firstName: value });
             }}
-            placeholder="Enter your first name"
+            placeholder="Enter your first name (optional)"
             maxLength={60}
             className="bg-white"
           />
@@ -125,11 +125,11 @@ export function BasicInformation({
 
         {/* Year of Birth */}
         <div className="space-y-2">
-          <Label htmlFor="yearOfBirth">Year of Birth *</Label>
+          <Label htmlFor="yearOfBirth">Year of Birth</Label>
           <VirtualizedYearSelect
             value={data.yearOfBirth as string}
             onValueChange={handleYearOfBirthChange}
-            placeholder="Select year"
+            placeholder="Select year (optional)"
             className="bg-white"
           />
         </div>
@@ -137,12 +137,12 @@ export function BasicInformation({
         {/* Year of Medical Graduation */}
         <div className="space-y-2">
           <Label htmlFor="yearOfMedicalGraduation">
-            Year of Medical Graduation *
+            Year of Medical Graduation
           </Label>
           <VirtualizedYearSelect
             value={data.yearOfMedicalGraduation as string}
             onValueChange={handleMedicalGraduationChange}
-            placeholder="Select year"
+            placeholder="Select year (optional)"
             className="bg-white"
           />
         </div>
@@ -150,7 +150,7 @@ export function BasicInformation({
 
       {/* Job Role */}
       <div className="space-y-4">
-        <Label>Applying for Job Role *</Label>
+        <Label>Applying for Job Role</Label>
         <RadioGroup
           value={data.applyingForJobRole}
           onValueChange={(value: string) =>
@@ -178,7 +178,7 @@ export function BasicInformation({
 
       {/* Target Markets */}
       <div className="space-y-4">
-        <Label>Target Market (multiple selections allowed) *</Label>
+        <Label>Target Market (multiple selections allowed)</Label>
         <OptimizedCheckboxGroup
           selectedValues={data.targetMarkets}
           onChange={handleTargetMarketChange}
