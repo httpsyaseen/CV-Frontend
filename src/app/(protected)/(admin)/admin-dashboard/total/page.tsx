@@ -183,10 +183,10 @@ export default function TotalCVsPage() {
           "bg-green-100 text-green-800 hover:bg-green-100 hover:text-green-800",
         label: "Reviewed",
       },
-      rejected: {
+      "in-progress": {
         className:
-          "bg-red-100 text-red-800 hover:bg-red-100 hover:text-red-800",
-        label: "Rejected",
+          "bg-purple-100 text-purple-800 hover:bg-purple-100 hover:text-purple-800",
+        label: "In Progress",
       },
     };
 
@@ -258,6 +258,7 @@ export default function TotalCVsPage() {
                       <TableHead>Email</TableHead>
                       <TableHead>Service Level</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Delivered</TableHead>
                       <TableHead>Submitted</TableHead>
                       <TableHead>Download CV</TableHead>
                       <TableHead>Download LOG</TableHead>
@@ -284,6 +285,19 @@ export default function TotalCVsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell>{getStatusBadge(cv.status)}</TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              cv.status === "reviewed"
+                                ? "bg-green-100 text-green-800 hover:bg-green-100 hover:text-green-800"
+                                : "bg-red-100 text-red-800 hover:bg-red-100 hover:text-red-800"
+                            }
+                          >
+                            {cv.status === "reviewed"
+                              ? "Delivered"
+                              : "Not Delivered"}
+                          </Badge>
+                        </TableCell>
                         <TableCell className="text-sm text-gray-600">
                           {formatDate(cv.createdAt)}
                         </TableCell>
@@ -314,7 +328,7 @@ export default function TotalCVsPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleViewReport(cv.reviewId!)}
-                            disabled={cv.status !== "reviewed" || !cv.reviewId}
+                            disabled={cv.status === "pending" || !cv.reviewId}
                             className="flex items-center gap-2 bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                           >
                             <Eye className="w-4 h-4" />

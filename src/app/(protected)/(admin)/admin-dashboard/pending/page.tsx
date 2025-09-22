@@ -18,8 +18,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Download, Upload } from "lucide-react";
+import { Loader2, Download, Upload, Send, Eye } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { downloadCVAsTxt } from "@/lib/cv-txt-generator";
 import { downloadCVAsLOGTxt } from "@/lib/log-txt-generator";
@@ -34,16 +35,26 @@ interface User {
   email: string;
 }
 
+interface PreviousExperience {
+  startDate: string;
+  endDate: string;
+  hospitalName: string;
+  hospitalAddress: string;
+  jobTitle: string;
+  jobDescription: string;
+  _id: string;
+}
+
 interface CV {
   _id: string;
-  userId?: User;
+  userId: User;
   firstName: string;
   lastName: string;
-  email?: string;
   yearOfBirth: number;
   yearOfMedicalGraduation: number;
   applyingForJobRole: string;
   targetMarkets: string[];
+  previousExperiences: PreviousExperience[];
   researchExperience: string;
   teachingExperience: string;
   leadershipManagementExperience: string;
@@ -54,7 +65,8 @@ interface CV {
   status: string;
   createdAt: string;
   updatedAt: string;
-  fullName: string;
+  __v: number;
+  reviewId?: string;
   id: string;
 }
 
@@ -66,11 +78,38 @@ interface ApiResponse {
   };
 }
 
+const getStatusBadge = (status: string) => {
+  const statusConfig = {
+    pending: {
+      className:
+        "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 hover:text-yellow-800",
+      label: "Pending",
+    },
+    reviewed: {
+      className:
+        "bg-green-100 text-green-800 hover:bg-green-100 hover:text-green-800",
+      label: "Reviewed",
+    },
+    "in-progress": {
+      className:
+        "bg-purple-100 text-purple-800 hover:bg-purple-100 hover:text-purple-800",
+      label: "In Progress",
+    },
+  };
+
+  const config =
+    statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+
+  return <Badge className={config.className}>{config.label}</Badge>;
+};
+
 export default function PendingRequestsPage() {
+  const router = useRouter();
   const [cvs, setCvs] = useState<CV[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [uploadingReview, setUploadingReview] = useState<string | null>(null);
+  const [deliveringCV, setDeliveringCV] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPendingCVs = async () => {
@@ -96,8 +135,15 @@ export default function PendingRequestsPage() {
   }, []);
 
   const getEmailFromCV = (cv: CV) => {
-    // Email can be in userId.email or directly in email field
-    return cv.userId?.email || cv.email || "N/A";
+    return cv.userId.email;
+  };
+
+  const getUserFullName = (cv: CV) => {
+    return `${cv.userId.firstName} ${cv.userId.lastName}`;
+  };
+
+  const handleViewReview = (reviewId: string) => {
+    router.push(`/review/${reviewId}`);
   };
 
   const handleDownloadLOGFile = (cvId: string) => {
@@ -110,9 +156,13 @@ export default function PendingRequestsPage() {
     }
 
     try {
-      // Generate and download the TXT file
-      downloadCVAsLOGTxt(cvData, 1); // Counter starts at 1
-      console.log(`Downloaded CV as TXT for: ${cvData.fullName}`);
+      // Add missing properties for the download function
+      const downloadData = {
+        ...cvData,
+        fullName: getUserFullName(cvData),
+      };
+      downloadCVAsLOGTxt(downloadData, 1); // Counter starts at 1
+      console.log(`Downloaded CV as TXT for: ${getUserFullName(cvData)}`);
     } catch (error) {
       console.error("Error downloading CV:", error);
       alert("Failed to download CV. Please try again.");
@@ -129,12 +179,42 @@ export default function PendingRequestsPage() {
     }
 
     try {
-      // Generate and download the TXT file
-      downloadCVAsTxt(cvData, 1); // Counter starts at 1
-      console.log(`Downloaded CV as TXT for: ${cvData.fullName}`);
+      // Add missing properties for the download function
+      const downloadData = {
+        ...cvData,
+        fullName: getUserFullName(cvData),
+      };
+      downloadCVAsTxt(downloadData, 1); // Counter starts at 1
+      console.log(`Downloaded CV as TXT for: ${getUserFullName(cvData)}`);
     } catch (error) {
       console.error("Error downloading CV:", error);
       alert("Failed to download CV. Please try again.");
+    }
+  };
+
+  const handleDeliverCV = async (cvId: string) => {
+    try {
+      setDeliveringCV(cvId);
+
+      const response = await api.post(`cv/deliver/${cvId}`);
+
+      if (response.data.status === "success") {
+        toast.success("CV delivered successfully!");
+
+        // Refresh the CV list after successful delivery
+        const refreshResponse = await api.get("cv/admin/pending");
+        const refreshData: ApiResponse = refreshResponse.data;
+        if (refreshData.status === "success") {
+          setCvs(refreshData.data.cvs);
+        }
+      } else {
+        toast.error("Failed to deliver CV");
+      }
+    } catch (error) {
+      console.error("Error delivering CV:", error);
+      showError(error);
+    } finally {
+      setDeliveringCV(null);
     }
   };
 
@@ -272,6 +352,8 @@ export default function PendingRequestsPage() {
                       <TableHead>Download LOG</TableHead>
                       <TableHead>Download CV</TableHead>
                       <TableHead>Upload Review</TableHead>
+                      <TableHead>View Review</TableHead>
+                      <TableHead>Deliver CV</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -281,9 +363,7 @@ export default function PendingRequestsPage() {
                           {cv._id.slice(-8).toUpperCase()}
                         </TableCell>
                         <TableCell className="font-medium">
-                          {cv.userId
-                            ? `${cv.userId.firstName} ${cv.userId.lastName}`
-                            : `${cv.firstName} ${cv.lastName}`}
+                          {getUserFullName(cv)}
                         </TableCell>
                         <TableCell>{getEmailFromCV(cv)}</TableCell>
                         <TableCell>
@@ -298,11 +378,7 @@ export default function PendingRequestsPage() {
                               cv.serviceLevel.slice(1)}
                           </Badge>
                         </TableCell>
-                        <TableCell>
-                          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 hover:text-yellow-800">
-                            Pending
-                          </Badge>
-                        </TableCell>
+                        <TableCell>{getStatusBadge(cv.status)}</TableCell>
                         <TableCell>
                           <Button
                             variant="outline"
@@ -341,6 +417,41 @@ export default function PendingRequestsPage() {
                             {uploadingReview === cv._id
                               ? "Uploading..."
                               : "Upload Review"}
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          {cv.reviewId ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewReview(cv.reviewId!)}
+                              className="flex items-center gap-2 bg-green-600 text-white hover:bg-green-700"
+                            >
+                              <Eye className="w-4 h-4" />
+                              View Review
+                            </Button>
+                          ) : (
+                            <span className="text-sm text-gray-500">
+                              No Review
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeliverCV(cv._id)}
+                            disabled={deliveringCV === cv._id || !cv.reviewId}
+                            className="flex items-center gap-2 bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          >
+                            {deliveringCV === cv._id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Send className="w-4 h-4" />
+                            )}
+                            {deliveringCV === cv._id
+                              ? "Delivering..."
+                              : "Deliver CV"}
                           </Button>
                         </TableCell>
                       </TableRow>

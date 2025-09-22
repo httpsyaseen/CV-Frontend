@@ -53,6 +53,31 @@ interface ApiResponse {
   };
 }
 
+const getStatusBadge = (status: string) => {
+  const statusConfig = {
+    pending: {
+      className:
+        "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 hover:text-yellow-800",
+      label: "Pending",
+    },
+    reviewed: {
+      className:
+        "bg-green-100 text-green-800 hover:bg-green-100 hover:text-green-800",
+      label: "Reviewed",
+    },
+    "in-progress": {
+      className:
+        "bg-purple-100 text-purple-800 hover:bg-purple-100 hover:text-purple-800",
+      label: "In Progress",
+    },
+  };
+
+  const config =
+    statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+
+  return <Badge className={config.className}>{config.label}</Badge>;
+};
+
 export default function PendingRequestsPage() {
   const [cvs, setCvs] = useState<CV[]>([]);
   const [loading, setLoading] = useState(true);
@@ -190,18 +215,7 @@ export default function PendingRequestsPage() {
                         <TableCell className="font-medium">
                           {cv.lastName}
                         </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={
-                              cv.status === "pending"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-blue-100 text-blue-800"
-                            }
-                          >
-                            {cv.status.charAt(0).toUpperCase() +
-                              cv.status.slice(1)}
-                          </Badge>
-                        </TableCell>
+                        <TableCell>{getStatusBadge(cv.status)}</TableCell>
                         <TableCell>
                           {getJobRoleDisplay(cv.applyingForJobRole)}
                         </TableCell>
