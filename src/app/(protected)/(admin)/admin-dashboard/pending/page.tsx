@@ -161,7 +161,9 @@ export default function PendingRequestsPage() {
         ...cvData,
         fullName: getUserFullName(cvData),
       };
-      downloadCVAsLOGTxt(downloadData, 1); // Counter starts at 1
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      downloadCVAsLOGTxt(downloadData as any, 1); // Counter starts at 1
       console.log(`Downloaded CV as TXT for: ${getUserFullName(cvData)}`);
     } catch (error) {
       console.error("Error downloading CV:", error);
@@ -184,7 +186,8 @@ export default function PendingRequestsPage() {
         ...cvData,
         fullName: getUserFullName(cvData),
       };
-      downloadCVAsTxt(downloadData, 1); // Counter starts at 1
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      downloadCVAsTxt(downloadData as any, 1); // Counter starts at 1
       console.log(`Downloaded CV as TXT for: ${getUserFullName(cvData)}`);
     } catch (error) {
       console.error("Error downloading CV:", error);

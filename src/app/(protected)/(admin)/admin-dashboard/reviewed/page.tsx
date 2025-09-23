@@ -128,7 +128,8 @@ export default function TotalCVsPage() {
         fullName: getUserFullName(cvData),
         id: cvData._id,
       };
-      downloadCVAsTxt(downloadData, 1);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      downloadCVAsTxt(downloadData as any, 1);
       toast.success(`Downloaded CV for: ${getUserFullName(cvData)}`);
     } catch (error) {
       console.error("Error downloading CV:", error);
@@ -151,7 +152,8 @@ export default function TotalCVsPage() {
         fullName: getUserFullName(cvData),
         id: cvData._id,
       };
-      downloadCVAsLOGTxt(downloadData, 1);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      downloadCVAsLOGTxt(downloadData as any, 1);
       toast.success(`Downloaded LOG for: ${getUserFullName(cvData)}`);
     } catch (error) {
       console.error("Error downloading LOG:", error);
