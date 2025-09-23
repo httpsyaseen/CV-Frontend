@@ -26,12 +26,17 @@ interface CVData {
   applyingForJobRole: string;
   targetMarkets: string[];
   previousExperiences?: PreviousExperience[];
+  // Updated field names to match new form structure
   researchExperience: string;
   teachingExperience: string;
-  leadershipManagementExperience: string;
-  auditQualityImprovementExperience: string;
-  clinicalSkillsProcedureCompetency: string;
+  teamworkAndCommunication: string;
+  leadershipAndManagement: string;
+  publicationsAndPresentations: string;
+  qualityImprovementAndAudit: string;
+  clinicalSkillsAndProcedures: string;
+  others: string;
   personalStatement: string;
+  supportingStatement?: string;
   serviceLevel: string;
   status: string;
   createdAt: string;
@@ -136,11 +141,8 @@ export const convertCVToTxt = (
   lines.push("LEADERSHIP AND MANAGEMENT EXPERIENCE");
   lines.push("=".repeat(50));
   lines.push("");
-  if (
-    cvData.leadershipManagementExperience &&
-    cvData.leadershipManagementExperience.trim()
-  ) {
-    lines.push(cvData.leadershipManagementExperience);
+  if (cvData.leadershipAndManagement && cvData.leadershipAndManagement.trim()) {
+    lines.push(cvData.leadershipAndManagement);
   }
   lines.push("");
 
@@ -150,10 +152,10 @@ export const convertCVToTxt = (
   lines.push("=".repeat(50));
   lines.push("");
   if (
-    cvData.auditQualityImprovementExperience &&
-    cvData.auditQualityImprovementExperience.trim()
+    cvData.qualityImprovementAndAudit &&
+    cvData.qualityImprovementAndAudit.trim()
   ) {
-    lines.push(cvData.auditQualityImprovementExperience);
+    lines.push(cvData.qualityImprovementAndAudit);
   }
   lines.push("");
 
@@ -163,20 +165,66 @@ export const convertCVToTxt = (
   lines.push("=".repeat(50));
   lines.push("");
   if (
-    cvData.clinicalSkillsProcedureCompetency &&
-    cvData.clinicalSkillsProcedureCompetency.trim()
+    cvData.clinicalSkillsAndProcedures &&
+    cvData.clinicalSkillsAndProcedures.trim()
   ) {
-    lines.push(cvData.clinicalSkillsProcedureCompetency);
+    lines.push(cvData.clinicalSkillsAndProcedures);
+  }
+  lines.push("");
+
+  // Teamwork and Communication Section
+  lines.push("=".repeat(50));
+  lines.push("TEAMWORK AND COMMUNICATION");
+  lines.push("=".repeat(50));
+  lines.push("");
+  if (
+    cvData.teamworkAndCommunication &&
+    cvData.teamworkAndCommunication.trim()
+  ) {
+    lines.push(cvData.teamworkAndCommunication);
+  }
+  lines.push("");
+
+  // Publications and Presentations Section
+  lines.push("=".repeat(50));
+  lines.push("PUBLICATIONS AND PRESENTATIONS");
+  lines.push("=".repeat(50));
+  lines.push("");
+  if (
+    cvData.publicationsAndPresentations &&
+    cvData.publicationsAndPresentations.trim()
+  ) {
+    lines.push(cvData.publicationsAndPresentations);
+  }
+  lines.push("");
+
+  // Others Section
+  lines.push("=".repeat(50));
+  lines.push("OTHERS");
+  lines.push("=".repeat(50));
+  lines.push("");
+  if (cvData.others && cvData.others.trim()) {
+    lines.push(cvData.others);
   }
   lines.push("");
 
   // Personal Statement Section
   lines.push("=".repeat(50));
-  lines.push("PERSONAL STATEMENT OR SUPPORTING DETAILS");
+  lines.push("PERSONAL STATEMENT");
   lines.push("=".repeat(50));
   lines.push("");
   if (cvData.personalStatement && cvData.personalStatement.trim()) {
     lines.push(cvData.personalStatement);
+  }
+  lines.push("");
+
+  // Supporting Statement Section
+  lines.push("=".repeat(50));
+  lines.push("SUPPORTING STATEMENT");
+  lines.push("=".repeat(50));
+  lines.push("");
+  if (cvData.supportingStatement && cvData.supportingStatement.trim()) {
+    lines.push(cvData.supportingStatement);
   }
   lines.push("");
 

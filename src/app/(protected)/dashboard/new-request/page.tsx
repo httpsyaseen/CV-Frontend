@@ -5,6 +5,7 @@ import { BasicInformation } from "./steps/basic-information";
 import { PreviousExperience } from "./steps/previous-experience";
 import { AcademicExperience } from "./steps/academic-information";
 import { PersonalStatement } from "./steps/personal-statement";
+import { SupportingStatement } from "./steps/supporting-statement";
 import { ServiceLevel } from "./steps/service-level";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
@@ -30,15 +31,21 @@ export interface FormData {
     jobDescription: string;
   }>;
 
-  // Academic Experience
-  researchExperience: string;
-  teachingExperience: string;
-  leadershipManagementExperience: string;
-  auditQualityImprovementExperience: string;
-  clinicalSkillsProcedureCompetency: string;
-
-  // Personal Statement
+  // Personal Statement (moved after previous experience)
   personalStatement: string;
+
+  // Academic Experience (expanded with new fields)
+  clinicalSkillsAndProcedures: string;
+  teachingExperience: string;
+  teamworkAndCommunication: string;
+  leadershipAndManagement: string;
+  researchExperience: string;
+  publicationsAndPresentations: string;
+  qualityImprovementAndAudit: string;
+  others: string;
+
+  // Supporting Statement (new section)
+  supportingStatement: string;
 
   // Service Level
   serviceLevel: string;
@@ -61,12 +68,16 @@ const initialFormData: FormData = {
       jobDescription: "",
     },
   ],
-  researchExperience: "",
-  teachingExperience: "",
-  leadershipManagementExperience: "",
-  auditQualityImprovementExperience: "",
-  clinicalSkillsProcedureCompetency: "",
   personalStatement: "",
+  clinicalSkillsAndProcedures: "",
+  teachingExperience: "",
+  teamworkAndCommunication: "",
+  leadershipAndManagement: "",
+  researchExperience: "",
+  publicationsAndPresentations: "",
+  qualityImprovementAndAudit: "",
+  others: "",
+  supportingStatement: "",
   serviceLevel: "",
 };
 
@@ -74,7 +85,7 @@ export default function NewRequestPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>(initialFormData);
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   const updateFormData = (data: Partial<FormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
@@ -179,28 +190,34 @@ export default function NewRequestPage() {
         submitData.previousExperiences = validPreviousExperiences;
       }
 
+      // Personal Statement - only include if not empty and has 5+ words
+      if (!shouldExcludeFromAPI(formData.personalStatement, true))
+        submitData.personalStatement = formData.personalStatement;
+
       // Academic Experience - only include if not empty and has 5+ words
       if (!shouldExcludeFromAPI(formData.researchExperience, true))
         submitData.researchExperience = formData.researchExperience;
       if (!shouldExcludeFromAPI(formData.teachingExperience, true))
         submitData.teachingExperience = formData.teachingExperience;
-      if (!shouldExcludeFromAPI(formData.leadershipManagementExperience, true))
-        submitData.leadershipManagementExperience =
-          formData.leadershipManagementExperience;
-      if (
-        !shouldExcludeFromAPI(formData.auditQualityImprovementExperience, true)
-      )
-        submitData.auditQualityImprovementExperience =
-          formData.auditQualityImprovementExperience;
-      if (
-        !shouldExcludeFromAPI(formData.clinicalSkillsProcedureCompetency, true)
-      )
-        submitData.clinicalSkillsProcedureCompetency =
-          formData.clinicalSkillsProcedureCompetency;
+      if (!shouldExcludeFromAPI(formData.teamworkAndCommunication, true))
+        submitData.teamworkAndCommunication = formData.teamworkAndCommunication;
+      if (!shouldExcludeFromAPI(formData.leadershipAndManagement, true))
+        submitData.leadershipAndManagement = formData.leadershipAndManagement;
+      if (!shouldExcludeFromAPI(formData.publicationsAndPresentations, true))
+        submitData.publicationsAndPresentations =
+          formData.publicationsAndPresentations;
+      if (!shouldExcludeFromAPI(formData.qualityImprovementAndAudit, true))
+        submitData.qualityImprovementAndAudit =
+          formData.qualityImprovementAndAudit;
+      if (!shouldExcludeFromAPI(formData.clinicalSkillsAndProcedures, true))
+        submitData.clinicalSkillsAndProcedures =
+          formData.clinicalSkillsAndProcedures;
+      if (!shouldExcludeFromAPI(formData.others, true))
+        submitData.others = formData.others;
 
-      // Personal Statement - only include if not empty and has 5+ words
-      if (!shouldExcludeFromAPI(formData.personalStatement, true))
-        submitData.personalStatement = formData.personalStatement;
+      // Supporting Statement - only include if not empty and has 5+ words
+      if (!shouldExcludeFromAPI(formData.supportingStatement, true))
+        submitData.supportingStatement = formData.supportingStatement;
 
       // Service Level - only include if not empty
       if (!isEmpty(formData.serviceLevel))
@@ -248,7 +265,7 @@ export default function NewRequestPage() {
         );
       case 3:
         return (
-          <AcademicExperience
+          <PersonalStatement
             data={formData}
             updateData={updateFormData}
             onNext={goToNext}
@@ -259,7 +276,7 @@ export default function NewRequestPage() {
         );
       case 4:
         return (
-          <PersonalStatement
+          <AcademicExperience
             data={formData}
             updateData={updateFormData}
             onNext={goToNext}
@@ -269,6 +286,17 @@ export default function NewRequestPage() {
           />
         );
       case 5:
+        return (
+          <SupportingStatement
+            data={formData}
+            updateData={updateFormData}
+            onNext={goToNext}
+            onPrevious={goToPrevious}
+            currentStep={currentStep}
+            totalSteps={totalSteps}
+          />
+        );
+      case 6:
         return (
           <ServiceLevel
             data={formData}

@@ -53,12 +53,17 @@ interface CV {
   applyingForJobRole: string;
   targetMarkets: string[];
   previousExperiences: PreviousExperience[];
+  // Updated field names to match new form structure
   researchExperience: string;
   teachingExperience: string;
-  leadershipManagementExperience: string;
-  auditQualityImprovementExperience: string;
-  clinicalSkillsProcedureCompetency: string;
+  teamworkAndCommunication?: string;
+  leadershipAndManagement?: string;
+  publicationsAndPresentations?: string;
+  qualityImprovementAndAudit?: string;
+  clinicalSkillsAndProcedures?: string;
+  others?: string;
   personalStatement: string;
+  supportingStatement?: string;
   serviceLevel: string;
   status: string;
   createdAt: string;
@@ -127,8 +132,17 @@ export default function TotalCVsPage() {
         ...cvData,
         fullName: getUserFullName(cvData),
         id: cvData._id,
+        // Provide defaults for missing fields
+        teamworkAndCommunication: cvData.teamworkAndCommunication || "",
+        leadershipAndManagement: cvData.leadershipAndManagement || "",
+        publicationsAndPresentations: cvData.publicationsAndPresentations || "",
+        qualityImprovementAndAudit: cvData.qualityImprovementAndAudit || "",
+        clinicalSkillsAndProcedures: cvData.clinicalSkillsAndProcedures || "",
+        others: cvData.others || "",
+        supportingStatement: cvData.supportingStatement || "",
       };
-      downloadCVAsTxt(downloadData, 1);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      downloadCVAsTxt(downloadData as any, 1);
       toast.success(`Downloaded CV for: ${getUserFullName(cvData)}`);
     } catch (error) {
       console.error("Error downloading CV:", error);
@@ -150,8 +164,17 @@ export default function TotalCVsPage() {
         ...cvData,
         fullName: getUserFullName(cvData),
         id: cvData._id,
+        // Provide defaults for missing fields
+        teamworkAndCommunication: cvData.teamworkAndCommunication || "",
+        leadershipAndManagement: cvData.leadershipAndManagement || "",
+        publicationsAndPresentations: cvData.publicationsAndPresentations || "",
+        qualityImprovementAndAudit: cvData.qualityImprovementAndAudit || "",
+        clinicalSkillsAndProcedures: cvData.clinicalSkillsAndProcedures || "",
+        others: cvData.others || "",
+        supportingStatement: cvData.supportingStatement || "",
       };
-      downloadCVAsLOGTxt(downloadData, 1);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      downloadCVAsLOGTxt(downloadData as any, 1);
       toast.success(`Downloaded LOG for: ${getUserFullName(cvData)}`);
     } catch (error) {
       console.error("Error downloading LOG:", error);

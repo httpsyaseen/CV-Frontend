@@ -23,15 +23,19 @@ export function AcademicExperience({
   currentStep,
   totalSteps,
 }: AcademicExperienceProps) {
-  const updateField = (field: keyof FormData, value: string) => {
+  const updateField = (
+    field: keyof FormData,
+    value: string,
+    maxWords: number
+  ) => {
     const words = value
       .trim()
       .split(/\s+/)
       .filter((word) => word.length > 0);
-    if (words.length <= 1000) {
+    if (words.length <= maxWords) {
       updateData({ [field]: value });
     } else {
-      const truncated = words.slice(0, 1000).join(" ");
+      const truncated = words.slice(0, maxWords).join(" ");
       updateData({ [field]: truncated });
     }
   };
@@ -46,34 +50,60 @@ export function AcademicExperience({
 
   const fields = [
     {
-      key: "researchExperience" as keyof FormData,
-      label: "Research Experience",
+      key: "clinicalSkillsAndProcedures" as keyof FormData,
+      label: "Clinical Skills and Procedures",
       placeholder:
-        "Describe your research experience, publications, presentations, and any ongoing research projects...",
+        "List your clinical skills, procedural competencies, certifications, and specialized training...",
+      maxWords: 500,
     },
     {
       key: "teachingExperience" as keyof FormData,
       label: "Teaching Experience",
       placeholder:
         "Detail your teaching roles, training programs, mentoring experience, and educational contributions...",
+      maxWords: 1000,
     },
     {
-      key: "leadershipAndManagementExperience" as keyof FormData,
-      label: "Leadership & Management Experience",
+      key: "teamworkAndCommunication" as keyof FormData,
+      label: "Teamwork and Communication",
+      placeholder:
+        "Describe your teamwork skills, communication abilities, collaborative experiences, and interpersonal strengths...",
+      maxWords: 1000,
+    },
+    {
+      key: "leadershipAndManagement" as keyof FormData,
+      label: "Leadership and Management",
       placeholder:
         "Outline your leadership roles, management responsibilities, team coordination, and organizational contributions...",
+      maxWords: 1000,
     },
     {
-      key: "auditAndQualityImprovementExperience" as keyof FormData,
-      label: "Audit & Quality Improvement Experience",
+      key: "researchExperience" as keyof FormData,
+      label: "Research Experience",
+      placeholder:
+        "Describe your research experience, publications, presentations, and any ongoing research projects...",
+      maxWords: 1000,
+    },
+    {
+      key: "publicationsAndPresentations" as keyof FormData,
+      label: "Publications and Presentations",
+      placeholder:
+        "List your publications, conference presentations, academic contributions, and scholarly activities...",
+      maxWords: 1000,
+    },
+    {
+      key: "qualityImprovementAndAudit" as keyof FormData,
+      label: "Quality Improvement and Audit",
       placeholder:
         "Describe your involvement in clinical audits, quality improvement projects, and process optimization initiatives...",
+      maxWords: 1000,
     },
     {
-      key: "clinicalSkillsAndProceduralCompetency" as keyof FormData,
-      label: "Clinical Skills & Procedure Competency",
+      key: "others" as keyof FormData,
+      label: "Others",
       placeholder:
-        "List your clinical skills, procedural competencies, certifications, and specialized training...",
+        "Include any other relevant experiences, achievements, or information that supports your application...",
+      maxWords: 500,
     },
   ];
 
@@ -91,19 +121,21 @@ export function AcademicExperience({
         {fields.map((field) => (
           <div key={field.key} className="space-y-3">
             <Label htmlFor={field.key} className="text-base font-medium">
-              {field.label}
+              {field.label} (Word Limit: {field.maxWords})
             </Label>
             <Textarea
               id={field.key}
               value={(data[field.key] as string) || ""}
-              onChange={(e) => updateField(field.key, e.target.value)}
+              onChange={(e) =>
+                updateField(field.key, e.target.value, field.maxWords)
+              }
               placeholder={field.placeholder}
               rows={6}
               className="bg-white resize-none"
             />
             <WordCounter
               currentWords={getWordCount((data[field.key] as string) || "")}
-              maxWords={1000}
+              maxWords={field.maxWords}
             />
           </div>
         ))}

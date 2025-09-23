@@ -26,12 +26,17 @@ interface CVData {
   applyingForJobRole: string;
   targetMarkets: string[];
   previousExperiences?: PreviousExperience[];
+  // Updated field names to match new form structure
   researchExperience: string;
   teachingExperience: string;
-  leadershipManagementExperience: string;
-  auditQualityImprovementExperience: string;
-  clinicalSkillsProcedureCompetency: string;
+  teamworkAndCommunication: string;
+  leadershipAndManagement: string;
+  publicationsAndPresentations: string;
+  qualityImprovementAndAudit: string;
+  clinicalSkillsAndProcedures: string;
+  others: string;
   personalStatement: string;
+  supportingStatement?: string;
   serviceLevel: string;
   status: string;
   createdAt: string;
@@ -71,7 +76,7 @@ const getJobRoleDisplay = (role: string): string => {
     middleGrade: "Middle Grade (Registrar, SpR, SCF, CF, etc.)",
     consultant: "Consultant",
   };
-  return roleMap[role] || role;
+  return roleMap[role] || role || "";
 };
 
 // Get target markets display
@@ -105,6 +110,17 @@ export const convertCVToTxt = (
 ): { content: string; filename: string } => {
   const lines: string[] = [];
 
+  // Helper function to check if a value is provided (not empty, null, or undefined)
+  const isProvided = (
+    value: string | number | string[] | null | undefined
+  ): boolean => {
+    if (value === null || value === undefined) return false;
+    if (typeof value === "string") return value.trim() !== "";
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === "number") return !isNaN(value) && value > 0;
+    return false;
+  };
+
   // First two lines: Service level and Last name
   lines.push(`Service level = ${cvData.serviceLevel}`);
   lines.push(`Last name = ${cvData.lastName}`);
@@ -115,24 +131,57 @@ export const convertCVToTxt = (
   lines.push("PERSONAL DETAILS");
   lines.push("=".repeat(50));
   lines.push("");
-  lines.push(`First Name: ${cvData.firstName}`);
-  lines.push(`Last Name: ${cvData.lastName}`);
-  lines.push(
-    `Full Name: ${cvData.fullName || `${cvData.firstName} ${cvData.lastName}`}`
-  );
 
-  // Email from userId or direct field
-  const email = cvData.userId?.email || cvData.email || "N/A";
-  lines.push(`Email: ${email}`);
+  // Only add fields if they are provided
+  if (isProvided(cvData.firstName)) {
+    lines.push(`First Name: ${cvData.firstName}`);
+  }
 
-  lines.push(`Year of Birth: ${cvData.yearOfBirth}`);
-  lines.push(`Year of Medical Graduation: ${cvData.yearOfMedicalGraduation}`);
-  lines.push(
-    `Applying for Job Role: ${getJobRoleDisplay(cvData.applyingForJobRole)}`
-  );
-  lines.push(
-    `Target Markets: ${getTargetMarketsDisplay(cvData.targetMarkets)}`
-  );
+  if (isProvided(cvData.lastName)) {
+    lines.push(`Last Name: ${cvData.lastName}`);
+  }
+
+  // Full name - only if different from first + last name combination
+  const calculatedFullName = `${cvData.firstName || ""} ${
+    cvData.lastName || ""
+  }`.trim();
+  const providedFullName = cvData.fullName?.trim();
+  if (isProvided(providedFullName) && providedFullName !== calculatedFullName) {
+    lines.push(`Full Name: ${providedFullName}`);
+  } else if (calculatedFullName && !providedFullName) {
+    lines.push(`Full Name: ${calculatedFullName}`);
+  }
+
+  // Email - only if provided
+  const email = cvData.userId?.email || cvData.email;
+  if (isProvided(email)) {
+    lines.push(`Email: ${email}`);
+  }
+
+  // Year of Birth - only if provided and valid
+  if (isProvided(cvData.yearOfBirth)) {
+    lines.push(`Year of Birth: ${cvData.yearOfBirth}`);
+  }
+
+  // Year of Medical Graduation - only if provided and valid
+  if (isProvided(cvData.yearOfMedicalGraduation)) {
+    lines.push(`Year of Medical Graduation: ${cvData.yearOfMedicalGraduation}`);
+  }
+
+  // Applying for Job Role - only if provided
+  if (isProvided(cvData.applyingForJobRole)) {
+    lines.push(
+      `Applying for Job Role: ${getJobRoleDisplay(cvData.applyingForJobRole)}`
+    );
+  }
+
+  // Target Markets - only if provided
+  if (isProvided(cvData.targetMarkets)) {
+    lines.push(
+      `Target Markets: ${getTargetMarketsDisplay(cvData.targetMarkets)}`
+    );
+  }
+
   lines.push("");
 
   // Previous Experience Section(s)
@@ -184,11 +233,8 @@ export const convertCVToTxt = (
   lines.push("LEADERSHIP AND MANAGEMENT EXPERIENCE");
   lines.push("=".repeat(50));
   lines.push("");
-  if (
-    cvData.leadershipManagementExperience &&
-    cvData.leadershipManagementExperience.trim()
-  ) {
-    lines.push(cvData.leadershipManagementExperience);
+  if (cvData.leadershipAndManagement && cvData.leadershipAndManagement.trim()) {
+    lines.push(cvData.leadershipAndManagement);
   }
   lines.push("");
 
@@ -198,10 +244,10 @@ export const convertCVToTxt = (
   lines.push("=".repeat(50));
   lines.push("");
   if (
-    cvData.auditQualityImprovementExperience &&
-    cvData.auditQualityImprovementExperience.trim()
+    cvData.qualityImprovementAndAudit &&
+    cvData.qualityImprovementAndAudit.trim()
   ) {
-    lines.push(cvData.auditQualityImprovementExperience);
+    lines.push(cvData.qualityImprovementAndAudit);
   }
   lines.push("");
 
@@ -211,20 +257,66 @@ export const convertCVToTxt = (
   lines.push("=".repeat(50));
   lines.push("");
   if (
-    cvData.clinicalSkillsProcedureCompetency &&
-    cvData.clinicalSkillsProcedureCompetency.trim()
+    cvData.clinicalSkillsAndProcedures &&
+    cvData.clinicalSkillsAndProcedures.trim()
   ) {
-    lines.push(cvData.clinicalSkillsProcedureCompetency);
+    lines.push(cvData.clinicalSkillsAndProcedures);
+  }
+  lines.push("");
+
+  // Teamwork and Communication Section
+  lines.push("=".repeat(50));
+  lines.push("TEAMWORK AND COMMUNICATION");
+  lines.push("=".repeat(50));
+  lines.push("");
+  if (
+    cvData.teamworkAndCommunication &&
+    cvData.teamworkAndCommunication.trim()
+  ) {
+    lines.push(cvData.teamworkAndCommunication);
+  }
+  lines.push("");
+
+  // Publications and Presentations Section
+  lines.push("=".repeat(50));
+  lines.push("PUBLICATIONS AND PRESENTATIONS");
+  lines.push("=".repeat(50));
+  lines.push("");
+  if (
+    cvData.publicationsAndPresentations &&
+    cvData.publicationsAndPresentations.trim()
+  ) {
+    lines.push(cvData.publicationsAndPresentations);
+  }
+  lines.push("");
+
+  // Others Section
+  lines.push("=".repeat(50));
+  lines.push("OTHERS");
+  lines.push("=".repeat(50));
+  lines.push("");
+  if (cvData.others && cvData.others.trim()) {
+    lines.push(cvData.others);
   }
   lines.push("");
 
   // Personal Statement Section
   lines.push("=".repeat(50));
-  lines.push("PERSONAL STATEMENT OR SUPPORTING DETAILS");
+  lines.push("PERSONAL STATEMENT");
   lines.push("=".repeat(50));
   lines.push("");
   if (cvData.personalStatement && cvData.personalStatement.trim()) {
     lines.push(cvData.personalStatement);
+  }
+  lines.push("");
+
+  // Supporting Statement Section
+  lines.push("=".repeat(50));
+  lines.push("SUPPORTING STATEMENT");
+  lines.push("=".repeat(50));
+  lines.push("");
+  if (cvData.supportingStatement && cvData.supportingStatement.trim()) {
+    lines.push(cvData.supportingStatement);
   }
   lines.push("");
 

@@ -28,10 +28,10 @@ export function PersonalStatement({
       .trim()
       .split(/\s+/)
       .filter((word) => word.length > 0);
-    if (words.length <= 2500) {
+    if (words.length <= 500) {
       updateData({ personalStatement: value });
     } else {
-      const truncated = words.slice(0, 2500).join(" ");
+      const truncated = words.slice(0, 500).join(" ");
       updateData({ personalStatement: truncated });
     }
   };
@@ -45,8 +45,8 @@ export function PersonalStatement({
 
   return (
     <FormStep
-      title="Personal Statement and Supporting Details"
-      description="Please provide your personal statement that highlights your motivation, career goals, and unique qualities"
+      title="Personal Statement"
+      description="Please provide your personal statement (500 words maximum)"
       currentStep={currentStep}
       totalSteps={totalSteps}
       onNext={onNext}
@@ -69,19 +69,19 @@ export function PersonalStatement({
 
         <div className="space-y-3 bg-white">
           <Label htmlFor="personalStatement" className="text-base font-medium">
-            Personal Statement
+            Personal Statement (Word Limit: 500)
           </Label>
           <Textarea
             id="personalStatement"
             value={data.personalStatement}
             onChange={(e) => updatePersonalStatement(e.target.value)}
             placeholder="Write your personal statement here. This is your opportunity to tell your story, explain your motivations, and demonstrate why you're the ideal candidate for this role..."
-            rows={12}
+            rows={8}
             className="bg-white resize-none"
           />
           <WordCounter
             currentWords={getWordCount(data.personalStatement)}
-            maxWords={2500}
+            maxWords={500}
           />
         </div>
 
@@ -89,8 +89,8 @@ export function PersonalStatement({
           <p className="text-sm text-amber-800">
             <strong>Tip:</strong> A well-crafted personal statement typically
             includes specific examples, demonstrates self-reflection, and
-            clearly articulates your career vision. Take your time to make it
-            compelling and authentic.
+            clearly articulates your career vision. Keep it concise and
+            impactful.
           </p>
         </div>
       </div>
