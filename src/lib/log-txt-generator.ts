@@ -45,17 +45,6 @@ interface CVData {
   id: string;
 }
 
-// Generate a random 3-character alphabetical string
-const generateRandomString = (): string => {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  let result = "";
-  for (let i = 0; i < 3; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-};
-
-// Format date to readable format
 const formatDate = (dateString: string): string => {
   try {
     const date = new Date(dateString);
@@ -93,15 +82,6 @@ const getTargetMarketsDisplay = (markets: string[]): string => {
 };
 
 // Generate filename with collision handling
-const generateFilename = (lastName: string, counter: number = 1): string => {
-  const randomString = generateRandomString();
-  const baseFilename = `${lastName}_${randomString}_${counter}.txt`;
-
-  // If we need to handle filename collisions, we can add GMT time
-  // For now, return the base filename as collision handling would require
-  // checking existing files which is typically done on the server side
-  return baseFilename;
-};
 
 // Convert CV data to formatted text
 export const convertCVToTxt = (
@@ -128,7 +108,7 @@ export const convertCVToTxt = (
 
   // Personal Details Section
   lines.push("=".repeat(50));
-  lines.push("PERSONAL DETAILS");
+  lines.push("USER INFO");
   lines.push("=".repeat(50));
   lines.push("");
 
@@ -333,7 +313,7 @@ export const convertCVToTxt = (
   );
 
   const content = lines.join("\n");
-  const filename = generateFilename(cvData.lastName, counter);
+  const filename = `LOG_${cvData._id}.txt`;
 
   return {
     content,

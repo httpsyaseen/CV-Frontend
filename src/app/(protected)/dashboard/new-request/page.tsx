@@ -85,6 +85,7 @@ export default function NewRequestPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const totalSteps = 6;
 
   const updateFormData = (data: Partial<FormData>) => {
@@ -105,6 +106,7 @@ export default function NewRequestPage() {
 
   const handleSubmit = async () => {
     try {
+      setIsSubmitting(true);
       // Helper function to check if a value is empty
       const isEmpty = (
         value: string | number | string[] | undefined | null
@@ -236,6 +238,8 @@ export default function NewRequestPage() {
     } catch (error) {
       console.error("Error submitting CV:", error);
       showError(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -254,7 +258,7 @@ export default function NewRequestPage() {
         );
       case 2:
         return (
-          <PreviousExperience
+          <PersonalStatement
             data={formData}
             updateData={updateFormData}
             onNext={goToNext}
@@ -263,9 +267,10 @@ export default function NewRequestPage() {
             totalSteps={totalSteps}
           />
         );
+
       case 3:
         return (
-          <PersonalStatement
+          <PreviousExperience
             data={formData}
             updateData={updateFormData}
             onNext={goToNext}
@@ -305,6 +310,7 @@ export default function NewRequestPage() {
             onPrevious={goToPrevious}
             currentStep={currentStep}
             totalSteps={totalSteps}
+            isSubmitting={isSubmitting}
           />
         );
       default:

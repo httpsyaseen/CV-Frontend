@@ -21,11 +21,7 @@ export function WordCounter({
       <span
         className={cn(
           "font-medium",
-          isOverLimit
-            ? "text-red-600"
-            : remainingWords <= 50
-            ? "text-orange-600"
-            : "text-gray-600"
+          isOverLimit ? "text-red-600" : "text-gray-600"
         )}
       >
         {isOverLimit

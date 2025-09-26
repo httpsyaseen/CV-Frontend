@@ -27,10 +27,41 @@ export function Header() {
             <span className="text-xl font-bold text-foreground">CVManager</span>
           </div>
 
-          {/* Desktop Navigation */}
-          {isAuthenticated ? (
-            // Authenticated state - show only logout button
-            <div className="hidden md:flex items-center space-x-4">
+          {/* Desktop Navigation - Always show navigation links */}
+          <nav className="hidden md:flex items-center space-x-8">
+            {/* Show Dashboard only when authenticated */}
+            {isAuthenticated && (
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+              >
+                Dashboard
+              </Link>
+            )}
+            <Link
+              href="/#home"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
+            >
+              Home
+            </Link>
+            <Link
+              href="/#features"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+            >
+              Features
+            </Link>
+            <Link
+              href="/#contact"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+            >
+              Contact
+            </Link>
+          </nav>
+
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
+            {isAuthenticated ? (
+              // Authenticated state - show logout button
               <Button
                 variant="ghost"
                 className=" hover:text-accent-foreground transition-all duration-200 bg-emerald-700 text-white hover:bg-emerald-600"
@@ -38,34 +69,9 @@ export function Header() {
               >
                 Logout
               </Button>
-            </div>
-          ) : (
-            // Non-authenticated state - show features navigation and auth buttons
-            <>
-              <nav className="hidden md:flex items-center space-x-8">
-                <Link
-                  href="/#home"
-                  className="text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/#features"
-                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-                >
-                  Features
-                </Link>
-
-                <Link
-                  href="/#contact"
-                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-                >
-                  Contact
-                </Link>
-              </nav>
-
-              {/* Desktop Auth Buttons */}
-              <div className="hidden md:flex items-center space-x-4">
+            ) : (
+              // Non-authenticated state - show login and signup buttons
+              <>
                 <Button
                   variant="ghost"
                   className=" hover:text-accent-foreground  bg-green-700 text-white transition-all duration-200 hover:scale-105"
@@ -79,9 +85,9 @@ export function Header() {
                 >
                   Sign Up
                 </Button>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -99,68 +105,81 @@ export function Header() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t animate-fade-in-up">
-            {isAuthenticated ? (
-              // Authenticated state - show only logout button
-              <nav className="flex flex-col space-y-4">
-                <Button
-                  variant="ghost"
-                  className="justify-start"
-                  onClick={() => {
-                    logout();
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  Logout
-                </Button>
-              </nav>
-            ) : (
-              // Non-authenticated state - show features navigation and auth buttons
-              <nav className="flex flex-col space-y-4">
-                <a
-                  href="#home"
-                  className="text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Home
-                </a>
-                <a
-                  href="#features"
+            <nav className="flex flex-col space-y-4">
+              {/* Always show navigation links */}
+              <a
+                href="#home"
+                className="text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Home
+              </a>
+              <a
+                href="#features"
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Features
+              </a>
+              <a
+                href="#contact"
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contact
+              </a>
+
+              {/* Show Dashboard only when authenticated */}
+              {isAuthenticated && (
+                <Link
+                  href="/dashboard"
                   className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Features
-                </a>
-                <a
-                  href="#how-it-works"
-                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  How It Works
-                </a>
-                <a
-                  href="#contact"
-                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Contact
-                </a>
-                <div className="flex flex-col space-y-2 pt-4 border-t">
+                  Dashboard
+                </Link>
+              )}
+
+              {/* Auth buttons section */}
+              <div className="flex flex-col space-y-2 pt-4 border-t">
+                {isAuthenticated ? (
+                  // Authenticated state - show logout button
                   <Button
                     variant="ghost"
-                    className="justify-start"
-                    onClick={() => router.replace("/login")}
+                    className="justify-start bg-emerald-700 text-white hover:bg-emerald-600"
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
                   >
-                    Login
+                    Logout
                   </Button>
-                  <Button
-                    className="justify-start bg-primary hover:bg-primary/90 text-primary-foreground"
-                    onClick={() => router.replace("/signup")}
-                  >
-                    Sign Up
-                  </Button>
-                </div>
-              </nav>
-            )}
+                ) : (
+                  // Non-authenticated state - show login and signup buttons
+                  <>
+                    <Button
+                      variant="ghost"
+                      className="justify-start bg-green-700 text-white hover:bg-green-600"
+                      onClick={() => {
+                        router.replace("/login");
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      Login
+                    </Button>
+                    <Button
+                      className="justify-start bg-primary hover:bg-primary/90 text-primary-foreground"
+                      onClick={() => {
+                        router.replace("/signup");
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      Sign Up
+                    </Button>
+                  </>
+                )}
+              </div>
+            </nav>
           </div>
         )}
       </div>

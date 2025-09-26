@@ -5,7 +5,7 @@ import type React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FormStepProps {
@@ -19,6 +19,7 @@ interface FormStepProps {
   canGoNext?: boolean;
   canGoPrevious?: boolean;
   isLastStep?: boolean;
+  isSubmitting?: boolean;
   className?: string;
 }
 
@@ -33,6 +34,7 @@ export function FormStep({
   canGoNext = true,
   canGoPrevious = true,
   isLastStep = false,
+  isSubmitting = false,
   className,
 }: FormStepProps) {
   const progressPercentage = (currentStep / totalSteps) * 100;
@@ -72,8 +74,8 @@ export function FormStep({
               <Button
                 variant="outline"
                 onClick={onPrevious}
-                disabled={!canGoPrevious || currentStep === 1}
-                className="flex items-center gap-2 bg-transparent"
+                disabled={!canGoPrevious || currentStep === 1 || isSubmitting}
+                className="flex items-center gap-2 bg-transparent disabled:cursor-not-allowed"
               >
                 <ChevronLeft className="w-4 h-4" />
                 Previous
@@ -81,11 +83,20 @@ export function FormStep({
 
               <Button
                 onClick={onNext}
-                disabled={!canGoNext}
-                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"
+                disabled={!canGoNext || isSubmitting}
+                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                {isLastStep ? "Submit" : "Next"}
-                {!isLastStep && <ChevronRight className="w-4 h-4" />}
+                {isSubmitting && isLastStep && (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                )}
+                {isLastStep
+                  ? isSubmitting
+                    ? "Submitting..."
+                    : "Submit"
+                  : "Next"}
+                {!isLastStep && !isSubmitting && (
+                  <ChevronRight className="w-4 h-4" />
+                )}
               </Button>
             </div>
           </CardContent>

@@ -147,6 +147,11 @@ export default function PendingRequestsPage() {
                   Back to Dashboard
                 </Button>
               </Link>
+              <Link href="/dashboard/reviewed">
+                <Button variant="outline" className="bg-green-600 text-white">
+                  View Reviewed CVs
+                </Button>
+              </Link>
               <Link href="/dashboard/new-request">
                 <Button variant="outline" className="bg-green-600 text-white">
                   Create New Request

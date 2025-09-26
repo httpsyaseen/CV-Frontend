@@ -30,7 +30,7 @@ type AuthContextType = {
     lastName: string;
     email: string;
     password: string;
-    phoneNumber: string;
+    phoneNumber?: string;
   }) => Promise<void>;
   logout: () => void;
 };
@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     lastName: string;
     email: string;
     password: string;
-    phoneNumber: string;
+    phoneNumber?: string;
   }) => {
     try {
       const { data } = await api.post("/user/signup", signupData, {

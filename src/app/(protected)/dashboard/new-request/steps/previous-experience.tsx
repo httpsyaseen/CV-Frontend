@@ -346,7 +346,7 @@ export function PreviousExperience({
                   />
                   <WordCounter
                     currentWords={getWordCount(job.jobDescription)}
-                    maxWords={750}
+                    maxWords={20}
                   />
                 </div>
               </CardContent>

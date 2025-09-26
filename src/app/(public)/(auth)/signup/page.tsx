@@ -34,7 +34,7 @@ const signupSchema = z
     firstName: z.string().min(2, "First name must be at least 2 characters"),
     lastName: z.string().min(2, "Last name must be at least 2 characters"),
     email: z.string().email("Please enter a valid email address"),
-    phone: z.string().min(10, "Please enter a valid phone number"),
+    phone: z.string().optional(),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
@@ -68,13 +68,23 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       // Transform data to match backend format
-      const signupData = {
+      const signupData: {
+        firstName: string;
+        lastName: string;
+        email: string;
+        password: string;
+        phoneNumber?: string;
+      } = {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         password: data.password,
-        phoneNumber: data.phone, // Note: frontend uses 'phone', backend expects 'phoneNumber'
       };
+
+      // Only include phoneNumber if it's provided and not empty
+      if (data.phone && data.phone.trim() !== "") {
+        signupData.phoneNumber = data.phone;
+      }
 
       await signup(signupData);
       toast.success("Account created successfully!");
@@ -162,7 +172,7 @@ export default function SignupPage() {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel>Phone Number (Optional)</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />

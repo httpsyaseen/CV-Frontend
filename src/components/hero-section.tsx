@@ -7,7 +7,7 @@ export function HeroSection() {
   return (
     <section
       id="home"
-      className="relative py-20 lg:py-32 overflow-hidden px-16"
+      className="relative py-20 lg:py-32 overflow-hidden px-4 md:px-16"
     >
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
@@ -34,6 +34,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 hover:scale-105 animate-pulse-glow"
+                onClick={() => (window.location.href = "/login")}
               >
                 Login Now
               </Button>

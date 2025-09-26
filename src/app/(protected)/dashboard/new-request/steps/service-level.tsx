@@ -19,6 +19,7 @@ interface ServiceLevelProps {
   onPrevious: () => void;
   currentStep: number;
   totalSteps: number;
+  isSubmitting?: boolean;
 }
 
 export function ServiceLevel({
@@ -28,8 +29,9 @@ export function ServiceLevel({
   onPrevious,
   currentStep,
   totalSteps,
+  isSubmitting = false,
 }: ServiceLevelProps) {
-  const canGoNext = data.serviceLevel !== "";
+  const canGoNext = data.serviceLevel !== "" && !isSubmitting;
 
   return (
     <FormStep
@@ -41,6 +43,7 @@ export function ServiceLevel({
       onPrevious={onPrevious}
       canGoNext={canGoNext}
       isLastStep={true}
+      isSubmitting={isSubmitting}
     >
       <div className="space-y-6">
         <RadioGroup

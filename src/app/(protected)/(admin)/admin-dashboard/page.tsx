@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileCheck, Clock, Percent } from "lucide-react";
+import { FileCheck, Clock } from "lucide-react";
 import Link from "next/link";
 
 type DashboardStats = {
@@ -40,7 +40,7 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white mx-16">
+    <div className="min-h-screen bg-white mx-4 md:mx-16">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
